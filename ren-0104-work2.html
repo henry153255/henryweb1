@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>萨克斯社 · 2026 春季招新 | Saxophone Club</title>
+<style>
+  :root{
+    --ink:#12141a;
+    --ink-2:#1b1f28;
+    --cream:#f7f2e7;
+    --brass:#d9a441;
+    --brass-2:#f0cd85;
+    --muted:#9aa3b2;
+    --line:rgba(217,164,65,.28);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",-apple-system,sans-serif;
+    color:var(--cream);
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(217,164,65,.16), transparent 60%),
+      radial-gradient(900px 500px at 0% 30%, rgba(70,120,160,.12), transparent 60%),
+      linear-gradient(180deg,#0b0d12 0%, #12141a 45%, #0b0d12 100%);
+    line-height:1.9;
+    font-size:16px;
+  }
+  a{color:var(--brass-2);}
+
+  /* ================= 左上角背景音乐按钮 ================= */
+  .music-dock{
+    position:fixed;
+    left:18px;
+    top:18px;
+    z-index:999;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .music-btn{
+    width:52px;height:52px;border-radius:50%;
+    border:1px solid var(--line);
+    background:rgba(20,23,30,.82);
+    color:var(--brass-2);
+    font-size:22px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(8px);
+    transition:.25s;
+    box-shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+  .music-btn:hover{background:rgba(217,164,65,.22);transform:translateY(-2px);}
+  .music-btn.playing{animation:pulse 1.8s infinite;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(217,164,65,.55);}
+    70%{box-shadow:0 0 0 16px rgba(217,164,65,0);}
+    100%{box-shadow:0 0 0 0 rgba(217,164,65,0);}
+  }
+  .music-tip{
+    font-size:12px;color:var(--muted);letter-spacing:.08em;
+    background:rgba(20,23,30,.8);border:1px solid rgba(255,255,255,.06);
+    padding:4px 10px;border-radius:20px;
+  }
+
+  /* ================= 顶部导航 ================= */
+  header.hero{
+    max-width:1080px;margin:0 auto;
+    padding:110px 24px 64px;
+    text-align:center;
+  }
+  .kicker{
+    letter-spacing:.42em;font-size:12px;color:var(--brass);
+    text-transform:uppercase;margin-bottom:18px;
+  }
+  h1.club-name{
+    font-size:clamp(44px,7vw,86px);
+    margin:0 0 8px;
+    letter-spacing:.12em;
+    background:linear-gradient(180deg,#fff6e2,#d9a441 62%,#8f6522);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-weight:800;
+  }
+  .en-name{font-size:14px;letter-spacing:.34em;color:var(--muted);margin-bottom:22px;}
+  .hero-line{
+    display:inline-block;max-width:760px;color:#d9d2c4;font-size:17px;
+  }
+  nav.main-nav{
+    position:sticky;top:0;z-index:900;
+    margin:0 auto 8px;max-width:1080px;
+    background:rgba(11,13,18,.86);
+    border-top:1px solid rgba(255,255,255,.06);
+    border-bottom:1px solid rgba(255,255,255,.06);
+    backdrop-filter:blur(10px);
+    display:flex;justify-content:center;flex-wrap:wrap;gap:6px;
+    padding:10px 12px;
+  }
+  nav.main-nav a{
+    color:#e8e2d4;text-decoration:none;font-size:15px;
+    padding:7px 18px;border-radius:999px;transition:.22s;
+  }
+  nav.main-nav a:hover{color:#12141a;background:var(--brass);}
+
+  /* ================= 通用区块 ================= */
+  main{max-width:1080px;margin:0 auto;padding:0 24px 40px;}
+  section{
+    position:relative;
+    padding:56px 0 40px;
+    border-bottom:1px dashed rgba(255,255,255,.08);
+  }
+  section > h2{
+    font-size:30px;margin:0 0 6px;letter-spacing:.06em;
+    display:flex;align-items:center;gap:12px;
+  }
+  section > h2::before{
+    content:"";width:6px;height:30px;border-radius:3px;
+    background:linear-gradient(180deg,var(--brass-2),#8f6522);
+  }
+  .sec-sub{color:var(--muted);font-size:13px;letter-spacing:.18em;margin:0 0 26px;}
+  .body-text p{margin:0 0 18px;color:#ded7c8;text-indent:2em;}
+  .body-text b{color:var(--brass-2);}
+
+  /* 一键返回顶部按钮 */
+  .to-top{
+    display:inline-flex;align-items:center;gap:8px;
+    margin-top:14px;
+    padding:9px 20px;border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(217,164,65,.08);
+    color:var(--brass-2);text-decoration:none;font-size:14px;
+    transition:.22s;
+  }
+  .to-top:hover{background:var(--brass);color:#12141a;border-color:var(--brass);}
+
+  /* ================= 活动安排表 ================= */
+  .table-wrap{overflow-x:auto;margin:8px 0 22px;}
+  table.schedule{
+    width:100%;border-collapse:collapse;min-width:760px;
+    background:rgba(255,255,255,.02);
+    border:1px solid rgba(217,164,65,.35);
+    font-size:15px;
+  }
+  table.schedule td,table.schedule th{
+    border:1px solid rgba(217,164,65,.28);
+    padding:12px 14px;
+    vertical-align:middle;
+  }
+  /* 第一行：跨 4 列的标题 */
+  table.schedule tr.title-row td{
+    text-align:center;
+    font-size:19px;font-weight:700;letter-spacing:.06em;
+    color:#12141a;
+    background:linear-gradient(90deg,#e6bb63,#c98f2c);
+    padding:14px;
+  }
+  /* 第二行：表头，内容居中 */
+  table.schedule tr.head-row th{
+    text-align:center;
+    color:var(--brass-2);
+    background:rgba(217,164,65,.10);
+    font-weight:700;letter-spacing:.08em;
+  }
+  table.schedule td.center{text-align:center;}
+  table.schedule tbody tr:hover{background:rgba(217,164,65,.06);}
+  .classroom-note{
+    color:#cdbf9f;font-size:13.5px;text-align:center;
+    border-left:3px solid var(--brass);
+    padding:6px 12px;display:inline-block;margin-bottom:8px;
+  }
+
+  /* ================= 风采展示 ================= */
+  .gallery{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:22px;margin:12px 0 26px;
+  }
+  figure.shot{
+    margin:0;border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;overflow:hidden;background:#0f1218;
+    transition:.28s;
+  }
+  figure.shot:hover{transform:translateY(-4px);border-color:var(--line);box-shadow:0 16px 34px rgba(0,0,0,.45);}
+  figure.shot a{display:block;line-height:0;position:relative;}
+  figure.shot img{width:100%;display:block;aspect-ratio:3/2;object-fit:cover;}
+  figure.shot a::after{
+    content:"点击查看活动介绍 →";
+    position:absolute;left:0;right:0;bottom:0;
+    padding:10px 14px;font-size:13px;line-height:1.6;
+    color:#fff;background:linear-gradient(180deg,transparent,rgba(0,0,0,.78));
+    opacity:0;transition:.25s;
+  }
+  figure.shot a:hover::after{opacity:1;}
+  figcaption{font-size:13px;color:var(--muted);padding:10px 14px;}
+
+  /* ================= 视频 ================= */
+  .video-frame{
+    margin:18px 0 8px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:14px;
+    padding:14px;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,.02) 0 12px, transparent 12px 24px),
+      #0d1016;
+    text-align:center;
+  }
+  .video-frame embed{max-width:100%;border-radius:8px;background:#000;}
+  .video-frame{position:relative;}
+  /* 封面：默认盖一层视频首帧海报，避免 embed 未播放时露出黑框；鼠标移入淡出，露出播放器控件 */
+  .video-cover{
+    position:absolute;left:14px;right:14px;top:14px;
+    height:405px;max-height:calc(100% - 28px);
+    border-radius:8px;
+    background:
+      linear-gradient(180deg,rgba(8,10,14,.18) 0%,rgba(8,10,14,.04) 42%,rgba(8,10,14,.86) 100%),
+      url("video/club-poster.jpg") center/cover no-repeat,
+      #0a0d12;
+    border:1px solid rgba(255,255,255,.08);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:10px;text-align:center;padding:24px;
+    pointer-events:none;                 /* 点击直接落到下面的 embed，一次点击即可播放 */
+    transition:opacity .3s ease;
+  }
+  .video-frame.is-ready:hover .video-cover,
+  .video-frame.is-ready.is-dismissed .video-cover{opacity:0;}   /* 首次移入后永久隐藏，避免播放中被海报盖住 */
+  /* 视频自带片名字幕，封面只放一个角标，避免文字重复 */
+  .vc-pill{
+    position:absolute;left:16px;bottom:16px;
+    display:inline-flex;align-items:center;gap:9px;
+    padding:8px 16px 8px 10px;border-radius:999px;
+    background:rgba(10,12,18,.66);
+    border:1px solid rgba(224,180,90,.55);
+    color:#ecd7a8;font-size:13px;letter-spacing:.5px;text-indent:0;
+    box-shadow:0 4px 16px rgba(0,0,0,.35);
+  }
+  .vc-pill i{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:50%;
+    background:var(--brass);color:#0a0d12;
+    font-style:normal;font-size:11px;padding-left:2px;
+    animation:vcPulse 2.4s ease-out infinite;
+  }
+  @keyframes vcPulse{
+    0%{box-shadow:0 0 0 0 rgba(224,180,90,.45);}
+    70%{box-shadow:0 0 0 12px rgba(224,180,90,0);}
+    100%{box-shadow:0 0 0 0 rgba(224,180,90,0);}
+  }
+  .video-cover .vc-icon{
+    width:64px;height:64px;border-radius:50%;
+    border:2px solid var(--brass);color:var(--brass-2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;padding-left:4px;
+  }
+  .video-cover .vc-title{margin:0;color:var(--brass-2);font-size:16px;text-indent:0;letter-spacing:1px;}
+  .video-cover .vc-sub{margin:0;color:#cfd5df;font-size:12.5px;max-width:520px;line-height:1.7;text-indent:0;}
+  /* 文件缺失时的兜底样式 */
+  .video-cover.is-missing{
+    background:
+      radial-gradient(600px 300px at 50% 40%, rgba(217,164,65,.18), transparent 70%),
+      linear-gradient(180deg,#12161f,#0a0d12);
+    border:1px dashed rgba(217,164,65,.4);
+    justify-content:center;padding:24px;gap:10px;
+  }
+  .video-note{font-size:13px;color:var(--muted);margin-top:10px;}
+
+  /* ================= 报名表 ================= */
+  form.join-form{margin-top:10px;}
+  table.form-table{
+    width:100%;border-collapse:collapse;
+    background:rgba(255,255,255,.02);
+    border:1px solid rgba(217,164,65,.3);
+    font-size:15px;
+  }
+  table.form-table th,table.form-table td{
+    border:1px solid rgba(217,164,65,.22);
+    padding:12px 14px;text-align:left;vertical-align:top;
+  }
+  table.form-table th{
+    width:190px;color:var(--brass-2);font-weight:600;
+    background:rgba(217,164,65,.08);white-space:nowrap;
+  }
+  input[type="radio"],input[type="checkbox"]{accent-color:var(--brass);width:16px;height:16px;vertical-align:-2px;}
+  input[type="text"],select,textarea{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:8px;
+    color:var(--cream);
+    padding:8px 12px;
+    font-size:15px;
+    font-family:inherit;
+    outline:none;
+    transition:.2s;
+  }
+  input[type="text"]:focus,select:focus,textarea:focus{
+    border-color:var(--brass);background:rgba(217,164,65,.08);
+  }
+  input[type="text"]{width:260px;}
+  input.short{width:64px;text-align:center;}
+  textarea{width:100%;min-height:110px;resize:vertical;}
+  label.opt{margin-right:18px;color:#ded7c8;cursor:pointer;}
+  select{width:200px;}
+  .btn-row{display:flex;gap:14px;}
+  button[type="submit"],button[type="reset"]{
+    padding:10px 30px;border-radius:999px;font-size:15px;cursor:pointer;
+    border:1px solid var(--brass);
+    font-family:inherit;transition:.22s;
+  }
+  button[type="submit"]{background:var(--brass);color:#12141a;font-weight:700;}
+  button[type="submit"]:hover{background:var(--brass-2);}
+  button[type="reset"]{background:transparent;color:var(--brass-2);}
+  button[type="reset"]:hover{background:rgba(217,164,65,.15);}
+
+  footer{
+    text-align:center;color:#7d8595;font-size:13px;
+    padding:34px 24px 46px;line-height:2;
+  }
+  footer a{color:#b9a06f;text-decoration:none;}
+
+  @media (max-width:640px){
+    header.hero{padding-top:96px;}
+    .music-tip{display:none;}
+    input[type="text"]{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== 1. 左上角：点击播放背景音乐（对应 ex3_23 音频导入） ========== -->
+<div class="music-dock">
+  <button class="music-btn" id="musicBtn" title="点击播放 / 暂停背景音乐" aria-label="播放背景音乐">♪</button>
+  <span class="music-tip" id="musicTip">点击播放背景音乐</span>
+  <audio id="bgm" loop preload="auto">
+    <!-- 换成海绵音乐下载的文件时，把 mp3 放到 audio/ 目录，下面这行取消注释并删掉 wav 那行即可 -->
+    <!-- <source src="audio/bgm.mp3" type="audio/mpeg"> -->
+    <source src="audio/bgm.wav" type="audio/wav">
+    你的浏览器不支持 audio 标签，请升级浏览器后重试。
+  </audio>
+</div>
+
+<!-- ========== 页头 ========== -->
+<header class="hero" id="top">
+  <div class="kicker">Shandong Normal University · Music Club</div>
+  <h1 class="club-name">萨克斯社</h1>
+  <div class="en-name">S A X O P H O N E &nbsp; C L U B</div>
+  <p class="hero-line">2026 年春季招新正式启动 —— 如果你也相信，铜管里吹出来的不只是音符，而是一个人没说完的话，欢迎推门进来。</p>
+</header>
+
+<!-- ========== 2. 五个锚点导航（对应 ex3_12） ========== -->
+<nav class="main-nav">
+  <a href="#intro">社团简介</a>
+  <a href="#schedule">活动安排</a>
+  <a href="#gallery">风采展示</a>
+  <a href="#stories">社员故事</a>
+  <a href="#join">在线报名</a>
+</nav>
+
+<main>
+
+  <!-- ========== 社团简介 ========== -->
+  <section id="intro">
+    <h2>社团简介</h2>
+    <p class="sec-sub">A B O U T &nbsp; U S</p>
+    <div class="body-text">
+      <p>萨克斯社成立于 2013 年秋天，是学校里最早一批由学生自发组建的器乐社团之一。十三年来，社团从一个只有四个人、一把旧中音萨克斯、在图书馆负一层空教室里偷偷练习的小圈子，慢慢长成了今天拥有一百余名在册社员、覆盖高音、中音、次中音、上低音四个声部、能够独立完成整场音乐会的社团。我们的指导老师是音乐学院管乐教研室的老师，每周固定时间来听一次合排，其余时间由各声部首席带着大家练。</p>
+      <p>很多人对萨克斯的印象停留在酒吧、商场或者某首流行歌的间奏里，觉得它是一件"热闹"的乐器。但在我们看来，萨克斯真正的魅力恰恰在于它的"人声感"——它离人声的距离比任何一件管乐器都近。气流的强弱、嘴唇的松紧、喉咙的位置，一点点变化就能让同一个音从呜咽变成大笑。所以我们社的排练从来不追求把谱子吹对就结束，我们更在意一句旋律里的呼吸在哪里、犹豫在哪里、决定在哪里。这也是社团名字下面那句英文标语的意思：<b>Let the brass speak what you cannot say.</b></p>
+      <p>社团的组织结构比较扁平：一位社长、两位副社长，下设演奏部、教学部、宣传部和后勤部。演奏部负责日常合排与演出曲目；教学部负责新社员的零基础教学，从怎么装哨片、怎么控制口型开始教；宣传部负责海报、拍照、视频剪辑和公众号；后勤部管乐器借用、场地申请和演出物资。每年春季招新之后，我们会把新社员按基础分成"零基础班"和"有基础班"，零基础班先用一个学期把长音、吐音、指法和两个八度的音阶打磨干净，第二个学期就可以进合排。</p>
+      <p>乐器和场地是初学者最担心的两件事，这里可以放心：社团有 18 把可以免费借用的中音萨克斯，哨片、卡箍、通条、软木膏这些消耗品社团统一采购，按成本价给社员；排练固定在艺术楼 A302 排练厅，每周三晚上七点到九点，另外周日下午有两个小时的自由练习时段，谁想来都可以来。我们不设 audition，不要求你入学前学过任何乐器，只要求你愿意每周空出这两个小时，并且愿意在别人都吹错的时候继续吹下去。</p>
+      <p>这些年我们参加过校庆演出、校园文化艺术节、省大学生艺术展演的器乐专场，也去过社区养老院和附属小学做公益演出。2025 年冬天，我们在音乐厅办了一场名为《铜管里的冬天》的专场音乐会，从皮亚佐拉的《自由探戈》到《城里的月光》，四百多个座位坐满，返场加了两次。演出结束之后有个大一新生跑来问我们："我一点基础都没有，还能加吗？"我们说，我们社一半的人，都是从这句话开始的。</p>
+      <p>如果你也在犹豫，不妨先来看一次排练。不用报名，不用带乐器，坐在最后一排听一个小时就好。我们会留一把椅子给你。</p>
+    </div>
+    <a class="to-top" href="#top">↑ 一键返回顶部</a>
+  </section>
+
+  <!-- ========== 3. 活动安排（跨行跨列表格，对应 ex3_16） ========== -->
+  <section id="schedule">
+    <h2>活动安排</h2>
+    <p class="sec-sub">S P R I N G &nbsp; 2 0 2 6</p>
+    <div class="body-text">
+      <p>2026 年春季学期，社团的活动围绕"打基础、上舞台、走出去"三条线索展开。学期前六周以教学和合排为主，把新社员的口型、气息、指法稳定下来，同时确定本学期音乐会曲目；学期中段进入分声部精排和舞台走台，配合校园文化艺术节的演出任务；学期末以《夏日铜管》专场音乐会和社区公益演出收尾。除固定排练外，本学期还安排了一次乐器保养工作坊、一次录音棚体验课和一次与其他高校萨克斯社团的联合交流，具体时间与地点见下表。</p>
+    </div>
+
+    <div class="table-wrap">
+      <table class="schedule">
+        <!-- 第一行：跨 4 列的表格标题 -->
+        <tr class="title-row">
+          <td colspan="4">萨克斯社 2026 年春季学期活动安排表</td>
+        </tr>
+        <!-- 第二行：表头，内容居中 -->
+        <tr class="head-row">
+          <th>时间</th>
+          <th>活动名称</th>
+          <th>地点</th>
+          <th>负责人</th>
+        </tr>
+        <tbody>
+          <tr>
+            <td class="center">第 2 周 周三 19:00</td>
+            <td>新成员见面会</td>
+            <!-- 与下一行的公开课在同一间教室：跨 2 行合并 -->
+            <td class="center" rowspan="2">艺术楼 A302 排练厅</td>
+            <td class="center">林晓</td>
+          </tr>
+          <tr>
+            <td class="center">第 4 周 周三 19:00</td>
+            <td>萨克斯基础教学公开课</td>
+            <td class="center">陈默</td>
+          </tr>
+          <tr>
+            <td class="center">第 5 周 周日 14:00</td>
+            <td>乐器保养与哨片调整工作坊</td>
+            <td class="center">艺术楼 A302 排练厅</td>
+            <td class="center">周予安</td>
+          </tr>
+          <tr>
+            <td class="center">第 7 周 起 每周三 19:00</td>
+            <td>春季学期合排（分声部 + 全团）</td>
+            <td class="center">艺术楼 A302 排练厅</td>
+            <td class="center">各声部首席</td>
+          </tr>
+          <tr>
+            <td class="center">第 10 周 周六 全天</td>
+            <td>校园文化艺术节器乐专场演出</td>
+            <td class="center">大学生活动中心 音乐厅</td>
+            <td class="center">社长团</td>
+          </tr>
+          <tr>
+            <td class="center">第 12 周 周日 15:00</td>
+            <td>录音棚体验课（分轨录音实践）</td>
+            <td class="center">音乐学院 3 号录音棚</td>
+            <td class="center">李沐</td>
+          </tr>
+          <tr>
+            <td class="center">第 14 周 周六 14:00</td>
+            <td>四校萨克斯社团联合交流与快闪</td>
+            <td class="center">中心广场 / 报告厅</td>
+            <td class="center">外联组</td>
+          </tr>
+          <tr>
+            <td class="center">第 16 周 周五 19:30</td>
+            <td>《夏日铜管》春季专场音乐会</td>
+            <td class="center">大学生活动中心 音乐厅</td>
+            <td class="center">全体社员</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="classroom-note">注：新成员见面会与萨克斯基础教学公开课安排在同一间教室（艺术楼 A302 排练厅），方便新同学熟悉排练场地。</p>
+    <br>
+    <a class="to-top" href="#top">↑ 一键返回顶部</a>
+  </section>
+
+  <!-- ========== 4. 风采展示（图片超链接 + 视频，对应 ex3_19 / ex3_20 / ex3_25） ========== -->
+  <section id="gallery">
+    <h2>风采展示</h2>
+    <p class="sec-sub">G A L L E R Y</p>
+    <div class="body-text">
+      <p>排练厅的灯总是偏黄，空调外机在窗外嗡嗡地响。每年的这个时候，我们会把上一年的照片翻出来，看看谁的发型变了、谁终于把那段十六分音符吹顺了、谁从最后一排挪到了第一排。下面两张是我们日常排练和演出的记录，<b>点击图片</b>可以打开社团活动介绍页，看看一个学期里我们究竟在做什么。</p>
+    </div>
+    <div class="gallery">
+      <figure class="shot">
+        <a href="club_intro.html" title="点击查看社团活动介绍">
+          <img src="images/sax-club-01.png" alt="萨克斯社日常排练照片">
+        </a>
+        <figcaption>图一 · 周三晚排练厅：中音声部在过《城里的月光》的第二段</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="club_intro.html" title="点击查看社团活动介绍">
+          <img src="images/sax-club-02.png" alt="萨克斯社舞台演出照片">
+        </a>
+        <figcaption>图二 · 冬季专场：四重奏在返场时被要求"再来一个"</figcaption>
+      </figure>
+    </div>
+
+    <div class="body-text">
+      <p>除了照片，我们也把去年冬天专场的一段影像剪成了一条短片。片子不长，如果你愿意，把声音开大一点——萨克斯最好听的部分，往往在第一个音之前的那半秒呼吸里。</p>
+    </div>
+    <!-- 视频：使用 embed 标签导入 mp4（对应 ex3_25） -->
+    <div class="video-frame" id="videoFrame">
+      <embed src="video/club.mp4" type="video/mp4" width="720" height="405" title="萨克斯社宣传短片">
+      <!-- 封面层：用视频首帧海报盖住未播放时的黑框，鼠标移入自动淡出露出播放控件；文件缺失时显示提示 -->
+      <div class="video-cover" id="videoCover">
+        <span class="vc-pill"><i>▶</i>播放短片 · 4 秒</span>
+      </div>
+    </div>
+    <div class="video-note" style="text-align:center;font-size:13px;color:#9aa3b2;">视频通过 &lt;embed&gt; 标签加载（对应教材 ex3_25），1280×720 / H.264 / 4.02 秒。</div>
+    <a class="to-top" href="#top">↑ 一键返回顶部</a>
+  </section>
+
+  <!-- ========== 5. 社员故事（1000 字以上） ========== -->
+  <section id="stories">
+    <h2>社员故事（节选）</h2>
+    <p class="sec-sub">S T O R I E S</p>
+    <div class="body-text">
+      <p>周予安是大二才加入社团的。大一那一年他几乎把所有课余时间都花在了专业课的作业上，日子过得像一条被拉直的线。他说自己第一次走进 A302，是因为路过时听见里面有人在吹一段很慢的旋律，吹错了，停下来，又从头开始，反复了七八遍。他在门口站了十分钟，那十分钟里没有人出来问他找谁。后来他推门进去，坐在最后一排，那天什么也没吹，只是听。第二个星期他又来了，第三个星期他借了一把社团的中音萨克斯，装上哨片，吹出了人生第一个"哇"的音——他说那声音难听得让他想笑，但就是那一声，让他突然觉得自己这一周有了一个可以期待的时刻。</p>
+      <p>零基础的人学萨克斯，最先遇到的不是指法，是脸。口型不对，吹两分钟腮帮子就酸；气息不稳，长音吹到第四拍就开始抖；最要命的是那种"我明明按对了键，为什么声音还是不像"的挫败感。教学部的陈默有一套自己的办法：他不让新社员一上来就吹曲子，而是先吹一个星期的长音，每天十分钟，只吹一个音，把音吹直、吹稳、吹到自己听着不难受为止。他说，萨克斯这件乐器是诚实的，你糊弄它，它一定听得出来。周予安就在那十分钟里，慢慢学会了怎么把气沉下去。</p>
+      <p>真正让他留下来的，是第一次合排。那天排的是《自由探戈》，他坐在最边上，负责一个几乎听不见的低音声部，谱子上只有几个长音。他说他原以为自己会无聊，可当三十多个人一起进来，铜管的声音从四面把他包住的时候，他忽然明白了为什么要"合"排——一个人吹得再好，也只是线条；合在一起，才有那种让人后背发麻的厚度。他那天吹得很轻，几乎是在听，但排完之后他在楼道里站了很久，舍不得走。</p>
+      <p>林晓是社长，也是社里少数从小学琴的人。她大一的时候差点退社，因为觉得自己太"业余"——高中练的是考级曲目，到了社团发现大家排的是爵士、是流行改编、是那种没有标准答案的东西。她习惯了把谱子吹准，却不太会即兴。第一次被要求在一段和弦上自己编四小节，她站在那里，脑子里一片空白。后来是当时的社长跟她说了一句话：<b>你不是在考试，你是在说话。说错了就接着说下去。</b>这句话她记了三年，现在每年招新，她都会原样讲给新社员听。</p>
+      <p>社团里还有一件被反复提起的小事。去年冬天专场前一天彩排，次中音声部的一位同学发现自己那把借来的琴按键漏气，几个音吹不响。晚上十点多，全社七八个人蹲在排练厅地上，拆键、换软木、涂膏、重新装回去，弄到快十二点。第二天演出结束，那位同学在后台哭了，说自己拖累了大家。社长说，你没拖累，你让我们在演出前多做了一件正确的事。</p>
+      <p>我们不太愿意把社团说成一个"温暖的家"这样的词，太满了。它更像一个每周三晚上会亮灯的房间：你可以带着一身的疲惫和没做完的作业走进来，把琴装上，吹错，被旁边的人笑一下，然后再吹一遍。久而久之你会发现，你来这里不只是为了学一件乐器，也是为了确认自己还有力气对某件事认真。</p>
+      <p>如果你读到这里，还愿意往下看一眼报名表，那我们大概就是同一类人。</p>
+    </div>
+    <a class="to-top" href="#top">↑ 一键返回顶部</a>
+  </section>
+
+  <!-- ========== 6. 在线报名（表单 + 表格，对应 ex3_30） ========== -->
+  <section id="join">
+    <h2>在线报名</h2>
+    <p class="sec-sub">J O I N &nbsp; U S</p>
+    <div class="body-text">
+      <p>本学期招新不设面试、不要求基础，报名长期开放。填完下面这张表之后，教学部会在三个工作日内通过手机或邮箱联系你，告知分班与第一次课的时间。如果你暂时还不确定，也可以先来听一次排练——每周三 19:00，艺术楼 A302，最后一排永远留着一个位置。乐器可以借，哨片社团按成本价提供，你只需要带你自己来。</p>
+    </div>
+
+    <form class="join-form" action="#" method="post">
+      <table class="form-table">
+        <tr>
+          <th>① 姓名</th>
+          <td><input type="text" name="name" placeholder="请输入你的姓名" required></td>
+        </tr>
+        <tr>
+          <th>② 性别</th>
+          <td>
+            <label class="opt"><input type="radio" name="gender" value="男" checked> 男</label>
+            <label class="opt"><input type="radio" name="gender" value="女"> 女</label>
+          </td>
+        </tr>
+        <tr>
+          <th>③ 出生日期</th>
+          <td>
+            <input type="text" class="short" name="birth_year"> 年
+            <input type="text" class="short" name="birth_month"> 月
+            <input type="text" class="short" name="birth_day"> 日
+          </td>
+        </tr>
+        <tr>
+          <th>④ 手机 / 邮箱</th>
+          <td>
+            <input type="text" name="phone" placeholder="手机号码" style="margin-right:10px;">
+            <input type="text" name="email" placeholder="常用邮箱">
+          </td>
+        </tr>
+        <tr>
+          <th>⑤ 是否有萨克斯基础</th>
+          <td>
+            <label class="opt"><input type="radio" name="basic" value="有基础"> 有基础</label>
+            <label class="opt"><input type="radio" name="basic" value="零基础" checked> 零基础</label>
+          </td>
+        </tr>
+        <tr>
+          <th>⑥ 兴趣方向</th>
+          <td>
+            <label class="opt"><input type="checkbox" name="interest" value="古典演奏" checked> 古典演奏</label>
+            <label class="opt"><input type="checkbox" name="interest" value="爵士即兴"> 爵士即兴</label>
+            <label class="opt"><input type="checkbox" name="interest" value="流行改编"> 流行改编</label>
+            <label class="opt"><input type="checkbox" name="interest" value="重奏合奏"> 重奏合奏</label>
+            <label class="opt"><input type="checkbox" name="interest" value="演出与策划"> 演出与策划</label>
+          </td>
+        </tr>
+        <tr>
+          <th>⑦ 年级</th>
+          <td>
+            <select name="grade">
+              <option value="大一" selected>大一</option>
+              <option value="大二">大二</option>
+              <option value="大三">大三</option>
+              <option value="大四">大四</option>
+              <option value="研究生">研究生</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>⑧ 自我介绍</th>
+          <td>
+            <textarea name="intro" placeholder="请简单介绍自己、以及加入萨克斯社的理由……"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <th>⑨ 是否服从活动安排</th>
+          <td>
+            <label class="opt"><input type="radio" name="obey" value="服从" checked> 服从</label>
+            <label class="opt"><input type="radio" name="obey" value="不服从"> 不服从</label>
+          </td>
+        </tr>
+        <tr>
+          <th>⑩ 提交</th>
+          <td>
+            <div class="btn-row">
+              <button type="submit">提交报名</button>
+              <button type="reset">重置表单</button>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </form>
+    <br>
+    <a class="to-top" href="#top">↑ 一键返回顶部</a>
+  </section>
+
+</main>
+
+<footer>
+  萨克斯社 · Saxophone Club &nbsp;|&nbsp; 排练时间：每周三 19:00–21:00 &nbsp;|&nbsp; 地点：艺术楼 A302 排练厅<br>
+  本页面为上机作业 work2 实践作品，图片、音频、视频均为示例占位素材。
+</footer>
+
+<script>
+  // 左上角按钮：点击播放 / 暂停背景音乐
+  (function () {
+    var btn = document.getElementById('musicBtn');
+    var bgm = document.getElementById('bgm');
+    var tip = document.getElementById('musicTip');
+
+    btn.addEventListener('click', function () {
+      if (bgm.paused) {
+        bgm.volume = 0.55;            // 背景音乐不要太吵
+        bgm.play().then(function () {
+          btn.classList.add('playing');
+          btn.textContent = '❚❚';
+          tip.textContent = '正在播放：社团主题曲';
+        }).catch(function () {
+          tip.textContent = '音频加载失败，请检查 audio/ 目录';
+        });
+      } else {
+        bgm.pause();
+        btn.classList.remove('playing');
+        btn.textContent = '♪';
+        tip.textContent = '点击播放背景音乐';
+      }
+    });
+
+    bgm.addEventListener('ended', function () {
+      btn.classList.remove('playing');
+      btn.textContent = '♪';
+      tip.textContent = '点击播放背景音乐';
+    });
+  })();
+
+  // 探测 video/club.mp4：存在则标记 is-ready（保留首帧海报，鼠标移入淡出）；缺失则切到提示样式
+  (function () {
+    var frame = document.getElementById('videoFrame');
+    var cover = document.getElementById('videoCover');
+    if (!frame || !cover) return;
+    var probe = document.createElement('video');
+    probe.preload = 'metadata';
+    probe.addEventListener('loadedmetadata', function () {
+      frame.classList.add('is-ready');
+      // 首次移入/触摸后永久隐藏封面，避免鼠标移出时海报又盖回正在播放的画面
+      ['mouseenter', 'touchstart'].forEach(function (ev) {
+        frame.addEventListener(ev, function () {
+          frame.classList.add('is-dismissed');
+        }, { once: true });
+      });
+    });
+    probe.addEventListener('error', function () {
+      cover.classList.add('is-missing');
+      cover.innerHTML =
+        '<div class="vc-icon" style="animation:none">!</div>' +
+        '<p class="vc-title">视频文件未找到</p>' +
+        '<p class="vc-sub">请确认 video/club.mp4 存在且文件名没有重复的 .mp4 后缀。</p>';
+    });
+    probe.src = 'video/club.mp4';
+  })();
+</script>
+</body>
+</html>
